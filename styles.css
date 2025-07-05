@@ -365,6 +365,64 @@ body {
     padding-right: 2.5rem;
 }
 
+/* --- MODALS CUSTOM --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-popup {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: var(--text-light);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+    background-color: var(--sidebar-bg);
+    color: var(--text-light);
+}
+
+.modal-body {
+    padding: 2rem;
+    color: var(--text-light);
+}
+
 /* --- MODALS (Bootstrap override) --- */
 .modal-content {
     background-color: var(--panel-bg);
@@ -468,6 +526,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     background-color: var(--bg-dark);
+    padding: 2rem;
 }
 
 .auth-card {

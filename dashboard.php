@@ -163,7 +163,7 @@ function getSortURL($sort_by, $current_sort_order) {
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Ankor-PukSoft - Twoje domeny'; include 'inc/head.php'; ?>
+<?php $page_title = 'SiteMap Checker - Twoje domeny'; include 'inc/head.php'; ?>
 <body>
 
 <div class="container">
@@ -173,11 +173,11 @@ function getSortURL($sort_by, $current_sort_order) {
         <header class="header">
             <h1>Twoje domeny</h1>
             <div class="header-actions">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <button type="button" class="btn btn-secondary" onclick="showChangePasswordModal()">
                     <i class="fa-solid fa-key"></i>
                     Zmień hasło
                 </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDomainModal">
+                <button type="button" class="btn btn-primary" onclick="showAddDomainModal()">
                     <i class="fa-solid fa-plus"></i>
                     Dodaj domenę
                 </button>
@@ -270,7 +270,7 @@ function getSortURL($sort_by, $current_sort_order) {
                             <td colspan="4" style="text-align: center; color: var(--text-dark); padding: 2rem;">
                                 <i class="fa-solid fa-globe" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><br>
                                 Nie masz jeszcze żadnych domen.<br>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDomainModal" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-primary" onclick="showAddDomainModal()" style="margin-top: 1rem;">
                                     Dodaj pierwszą domenę
                                 </button>
                             </td>
@@ -283,70 +283,101 @@ function getSortURL($sort_by, $current_sort_order) {
 </div>
 
 <!-- Modal zmiany hasła -->
-<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="changePasswordModalLabel">
-                    <i class="fa-solid fa-key"></i>
+<div class="modal-overlay" id="changePasswordModal" style="display: none;">
+    <div class="modal-popup">
+        <div class="modal-header">
+            <h3>
+                <i class="fa-solid fa-key"></i>
+                Zmień hasło
+            </h3>
+            <button type="button" class="modal-close" onclick="hideChangePasswordModal()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="current_password" class="form-label">Obecne hasło</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password" class="form-label">Nowe hasło</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">Potwierdź nowe hasło</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i>
                     Zmień hasło
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="">
-                    <div class="form-group">
-                        <label for="current_password" class="form-label">Obecne hasło</label>
-                        <input type="password" class="form-control" id="current_password" name="current_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password" class="form-label">Nowe hasło</label>
-                        <input type="password" class="form-control" id="new_password" name="new_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm_password" class="form-label">Potwierdź nowe hasło</label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa-solid fa-save"></i>
-                        Zmień hasło
-                    </button>
-                </form>
-            </div>
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
 <!-- Modal dodawania domeny -->
-<div class="modal fade" id="addDomainModal" tabindex="-1" aria-labelledby="addDomainModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addDomainModalLabel">
+<div class="modal-overlay" id="addDomainModal" style="display: none;">
+    <div class="modal-popup">
+        <div class="modal-header">
+            <h3>
+                <i class="fa-solid fa-plus"></i>
+                Dodaj domenę
+            </h3>
+            <button type="button" class="modal-close" onclick="hideAddDomainModal()">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="">
+                <div class="form-group">
+                    <label for="domain" class="form-label">URL sitemapy</label>
+                    <input type="url" class="form-control" id="domain" name="domain" 
+                           placeholder="https://example.com/sitemap.xml" required>
+                    <small style="color: var(--text-dark); margin-top: 0.5rem; display: block;">
+                        Wprowadź pełny adres URL do sitemapy XML
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i>
                     Dodaj domenę
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="">
-                    <div class="form-group">
-                        <label for="domain" class="form-label">URL sitemapy</label>
-                        <input type="url" class="form-control" id="domain" name="domain" 
-                               placeholder="https://example.com/sitemap.xml" required>
-                        <small style="color: var(--text-dark); margin-top: 0.5rem; display: block;">
-                            Wprowadź pełny adres URL do sitemapy XML
-                        </small>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa-solid fa-plus"></i>
-                        Dodaj domenę
-                    </button>
-                </form>
-            </div>
+                </button>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+function showChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'flex';
+}
+
+function hideChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+}
+
+function showAddDomainModal() {
+    document.getElementById('addDomainModal').style.display = 'flex';
+}
+
+function hideAddDomainModal() {
+    document.getElementById('addDomainModal').style.display = 'none';
+}
+
+// Zamknij modal po kliknięciu w tło
+document.getElementById('changePasswordModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideChangePasswordModal();
+    }
+});
+
+document.getElementById('addDomainModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideAddDomainModal();
+    }
+});
+</script>
 
 </body>
 </html>

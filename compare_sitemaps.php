@@ -130,72 +130,134 @@ function generatePagination($current_page, $total_pages, $domain_id, $filter_tex
 
     return $pagination_html;
 }
+
+function simplifyDomain($url) {
+    $parsed_url = parse_url($url);
+    $domain = isset($parsed_url['host']) ? $parsed_url['host'] : $parsed_url['path'];
+    return preg_replace('/^www\./', '', $domain);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Porównanie sitemap - ' . htmlspecialchars($domain['domain']); include 'inc/head.php'; ?>
+<?php $page_title = 'SiteMap Checker - Porównanie sitemap'; include 'inc/head.php'; ?>
 <body>
+
+<div class="container">
     <?php include('inc/sidebar.php'); ?>
     
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="container mt-5">
-            <h1 class="text-center mb-4">Porównanie sitemap: <?= htmlspecialchars($domain['domain']) ?></h1>
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="domain.php?id=<?= $domain_id ?>"><?= htmlspecialchars(simplifyDomain($domain['domain'])) ?></a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Porównanie sitemap</span>
+        </div>
 
-            <!-- Formularz do filtrowania URL-i -->
-            <form method="GET" action="" class="mb-4">
+        <header class="header">
+            <h1><?= htmlspecialchars(simplifyDomain($domain['domain'])) ?></h1>
+            <div class="header-actions">
+                <a href="domain.php?id=<?= $domain_id ?>" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Powrót
+                </a>
+            </div>
+        </header>
+
+        <!-- Formularz do filtrowania URL-i -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-filter"></i>
+                Filtrowanie URL-i
+            </h3>
+            <form method="GET" action="">
                 <input type="hidden" name="domain_id" value="<?= $domain_id ?>">
-                <div class="mb-3">
-                    <label for="filter_text" class="form-label">Filtruj URL-e:</label>
-                    <input type="text" name="filter_text" id="filter_text" class="form-control" value="<?= htmlspecialchars($filter_text) ?>" placeholder="Wpisz tekst do filtrowania">
+                <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                    <div class="form-group" style="flex: 1; min-width: 300px;">
+                        <label for="filter_text" class="form-label">Filtruj URL-e:</label>
+                        <input type="text" name="filter_text" id="filter_text" class="form-control" value="<?= htmlspecialchars($filter_text) ?>" placeholder="Wpisz tekst do filtrowania">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-filter"></i>
+                            Filtruj
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Filtruj</button>
             </form>
+        </div>
 
-            <div class="row">
-                <!-- Dodane URL -->
-                <div class="col-md-6">
-                    <h3>Dodane URL:</h3>
-                    <?php if (count($added_urls) > 0): ?>
-                      <p>Znaleziono <?= $filtered_added_count ?> adresów URL dodanych.</p>
-                        <ul class="list-group mb-4">
-                            <?php foreach ($added_urls as $url): ?>
-                                <li class="list-group-item" style="font-size: 13px;"><a href="<?= htmlspecialchars($url) ?>" rel="nofollow" target="_blank"><?= htmlspecialchars($url) ?></a></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <div class="alert alert-success">Brak nowych URL-i.</div>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Usunięte URL -->
-                <div class="col-md-6">
-                    <h3>Usunięte URL:</h3>
-                    <?php if (count($removed_urls) > 0): ?>
-                       <p>Znaleziono <?= $filtered_removed_count ?> adresów URL usuniętych.</p>
-                        <ul class="list-group mb-4">
-                            <?php foreach ($removed_urls as $url): ?>
-                                <li class="list-group-item" style="font-size: 13px;"><a href="<?= htmlspecialchars($url) ?>" rel="nofollow" target="_blank"><?= htmlspecialchars($url) ?></a></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <div class="alert alert-danger">Brak usuniętych URL-i.</div>
-                    <?php endif; ?>
-                   
-                </div>
+        <!-- Wyniki porównania -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Dodane URL -->
+            <div class="content-panel">
+                <h3 style="margin-bottom: 1.5rem; color: var(--green-accent);">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    Dodane URL-e
+                </h3>
+                <p style="color: var(--text-dark); margin-bottom: 1rem;">
+                    Znaleziono <?= $filtered_added_count ?> adresów URL dodanych.
+                </p>
+                <?php if (count($added_urls) > 0): ?>
+                    <div style="max-height: 600px; overflow-y: auto;">
+                        <?php foreach ($added_urls as $url): ?>
+                            <div style="background-color: var(--sidebar-bg); padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 6px; border-left: 3px solid var(--green-accent);">
+                                <a href="<?= htmlspecialchars($url) ?>" rel="nofollow" target="_blank" style="color: var(--text-light); text-decoration: none; font-size: 0.9rem; word-break: break-all;">
+                                    <i class="fa-solid fa-external-link-alt" style="margin-right: 0.5rem; color: var(--green-accent);"></i>
+                                    <?= htmlspecialchars($url) ?>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div style="text-align: center; color: var(--text-dark); padding: 2rem;">
+                        <i class="fa-solid fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><br>
+                        Brak nowych URL-i.
+                    </div>
+                <?php endif; ?>
             </div>
 
-            <!-- Paginacja -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
+            <!-- Usunięte URL -->
+            <div class="content-panel">
+                <h3 style="margin-bottom: 1.5rem; color: var(--red-accent);">
+                    <i class="fa-solid fa-minus-circle"></i>
+                    Usunięte URL-e
+                </h3>
+                <p style="color: var(--text-dark); margin-bottom: 1rem;">
+                    Znaleziono <?= $filtered_removed_count ?> adresów URL usuniętych.
+                </p>
+                <?php if (count($removed_urls) > 0): ?>
+                    <div style="max-height: 600px; overflow-y: auto;">
+                        <?php foreach ($removed_urls as $url): ?>
+                            <div style="background-color: var(--sidebar-bg); padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 6px; border-left: 3px solid var(--red-accent);">
+                                <a href="<?= htmlspecialchars($url) ?>" rel="nofollow" target="_blank" style="color: var(--text-light); text-decoration: none; font-size: 0.9rem; word-break: break-all;">
+                                    <i class="fa-solid fa-external-link-alt" style="margin-right: 0.5rem; color: var(--red-accent);"></i>
+                                    <?= htmlspecialchars($url) ?>
+                                </a>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div style="text-align: center; color: var(--text-dark); padding: 2rem;">
+                        <i class="fa-solid fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><br>
+                        Brak usuniętych URL-i.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Paginacja -->
+        <?php if ($total_pages > 1): ?>
+        <div style="text-align: center; margin-top: 2rem;">
+            <nav>
+                <ul class="pagination">
                     <?= generatePagination($page, $total_pages, $domain_id, $filter_text); ?>
                 </ul>
             </nav>
-
-            <!-- Powrót do widoku szczegółów domeny -->
-            <div class="text-center mt-3 mb-5">
-                <a href="domain.php?id=<?= $domain_id ?>" class="btn btn-secondary">Powrót do szczegółów domeny</a>
-            </div>
         </div>
+        <?php endif; ?>
     </main>
+</div>
+
 </body>
 </html>

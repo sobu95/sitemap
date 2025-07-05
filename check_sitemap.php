@@ -198,33 +198,76 @@ if (isset($_POST['check_now'])) {
         error_log($error_message);
     }
 }
+
+function simplifyDomain($url) {
+    $parsed_url = parse_url($url);
+    $domain = isset($parsed_url['host']) ? $parsed_url['host'] : $parsed_url['path'];
+    return preg_replace('/^www\./', '', $domain);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Sprawdzanie sitemapy - ' . htmlspecialchars($domain['domain']); include 'inc/head.php'; ?>
+<?php $page_title = 'SiteMap Checker - Sprawdzanie sitemapy'; include 'inc/head.php'; ?>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Sprawdzanie sitemapy: <?= htmlspecialchars($domain['domain']) ?></h1>
 
-    <?php if ($success_message): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
-    <?php endif; ?>
-    
-    <?php if ($error_message): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error_message) ?></div>
-    <?php endif; ?>
+<div class="container">
+    <?php include('inc/sidebar.php'); ?>
 
-    <!-- Przycisk do ręcznego sprawdzenia sitemapy -->
-    <form method="POST" action="">
-        <div class="text-center">
-            <button type="submit" name="check_now" class="btn btn-primary">Sprawdź teraz sitemapę</button>
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="domain.php?id=<?= $domain_id ?>"><?= htmlspecialchars(simplifyDomain($domain['domain'])) ?></a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Sprawdzanie sitemapy</span>
         </div>
-    </form>
 
-    <!-- Powrót do widoku szczegółów domeny -->
-    <div class="text-center mt-3">
-        <a href="domain.php?id=<?= $domain_id ?>" class="btn btn-secondary">Powrót do szczegółów domeny</a>
-    </div>
+        <header class="header">
+            <h1>Sprawdzanie sitemapy</h1>
+            <div class="header-actions">
+                <a href="domain.php?id=<?= $domain_id ?>" class="btn btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Powrót
+                </a>
+            </div>
+        </header>
+
+        <?php if ($success_message): ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <?= htmlspecialchars($success_message) ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($error_message): ?>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error_message) ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Informacje o domenie -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-globe"></i>
+                <?= htmlspecialchars(simplifyDomain($domain['domain'])) ?>
+            </h3>
+            <p style="color: var(--text-dark); margin-bottom: 2rem;">
+                <strong>Pełny URL:</strong> <?= htmlspecialchars($domain['domain']) ?>
+            </p>
+            
+            <!-- Przycisk do ręcznego sprawdzenia sitemapy - wyśrodkowany -->
+            <div style="text-align: center;">
+                <form method="POST" action="">
+                    <button type="submit" name="check_now" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                        <i class="fa-solid fa-play"></i>
+                        Sprawdź teraz sitemapę
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
 </div>
+
 </body>
 </html>

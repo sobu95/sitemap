@@ -71,12 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Ankor-PukSoft - Resetowanie hasła'; include 'inc/head.php'; ?>
+<?php $page_title = 'SiteMap Checker - Resetowanie hasła'; include 'inc/head.php'; ?>
 <body>
 
 <div class="auth-container">
     <div class="auth-card">
-        <div class="auth-logo">Ankor-PukSoft</div>
+        <div class="auth-logo">SiteMap Checker</div>
         <h1 class="auth-title">Zapomniałeś hasła?</h1>
 
         <?php if ($error): ?>

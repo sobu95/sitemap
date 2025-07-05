@@ -1,6 +1,6 @@
 <?php
 if (!isset($page_title)) {
-    $page_title = 'Ankor-PukSoft';
+    $page_title = 'SiteMap Checker';
 }
 ?>
 <head>

@@ -12,7 +12,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <aside class="sidebar">
-    <div class="logo">Ankor-PukSoft</div>
+    <div class="logo">SiteMap Checker</div>
     
     <nav class="nav-menu">
         <ul>

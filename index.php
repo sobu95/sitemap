@@ -31,12 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Ankor-PukSoft - Logowanie'; include 'inc/head.php'; ?>
+<?php $page_title = 'SiteMap Checker - Logowanie'; include 'inc/head.php'; ?>
 <body>
 
 <div class="auth-container">
     <div class="auth-card">
-        <div class="auth-logo">Ankor-PukSoft</div>
+        <div class="auth-logo">SiteMap Checker</div>
         <h1 class="auth-title">Zaloguj się</h1>
 
         <?php if ($error): ?>
