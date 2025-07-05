@@ -7,99 +7,70 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $is_admin = ($user['role'] === 'admin');
 
-$error = '';
-$success = '';
-
+// Określenie aktywnej strony
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
-<style>
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 100;
-        height: 100%;
-        width: 250px;
-        background-color: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-    }
-
-    .sidebar-sticky {
-        position: relative;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .nav-links {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 15px 0;
-    }
-
-    .additional-tools {
-        margin: 15px;
-        text-align: left;
-    }
-
-    .logout-button {
-        margin: 15px;
-        padding: 10px;
-        background-color: #007bff;
-        color: #fff;
-        text-align: center;
-        text-decoration: none;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        cursor: pointer;
-    }
-
-    .logout-button:hover {
-        background-color: #0056b3;
-    }
-</style>
-
-<div class="container-fluid">
-    <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky sidebar-sticky">
-                <h3 style="margin-top:20px; margin-left: 15px; color:black; font-size:1.5rem;">Panel użytkownika</h3>
-                <div class="nav-links">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="dashboard.php">Domeny</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profile.php">Profil</a>
-                        </li>
-                        <?php if ($is_admin): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin.php">Panel administratora</a>
-                        </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-                <div class="additional-tools">
-                    <h6 style="color: black; font-size: 1.2rem;">Dodatkowe narzędzia</h6>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="checker/">
-                                Status Code Checker
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <a href="logout.php" class="logout-button">
-                    <span>&#128274;</span> Wyloguj się
+<aside class="sidebar">
+    <div class="logo">Ankor-PukSoft</div>
+    
+    <nav class="nav-menu">
+        <ul>
+            <li class="<?= ($current_page == 'dashboard.php') ? 'active' : '' ?>">
+                <a href="dashboard.php">
+                    <i class="fa-solid fa-globe"></i>
+                    Domeny
                 </a>
-            </div>
-        </nav>
+            </li>
+            <li class="<?= ($current_page == 'profile.php') ? 'active' : '' ?>">
+                <a href="profile.php">
+                    <i class="fa-solid fa-user"></i>
+                    Profil
+                </a>
+            </li>
+            <?php if ($is_admin): ?>
+            <li class="<?= ($current_page == 'admin.php') ? 'active' : '' ?>">
+                <a href="admin.php">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Panel administratora
+                </a>
+            </li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+
+    <div class="tools">
+        <div class="tools-header">Narzędzia dodatkowe</div>
+        <ul>
+            <li>
+                <a href="checker/">
+                    <i class="fa-solid fa-stethoscope"></i>
+                    Status Code Checker
+                </a>
+            </li>
+            <li>
+                <a href="url-to-text.php">
+                    <i class="fa-solid fa-link"></i>
+                    Wyciąganie URL
+                </a>
+            </li>
+            <li>
+                <a href="image_info.php">
+                    <i class="fa-solid fa-image"></i>
+                    Info o grafikach
+                </a>
+            </li>
+            <li>
+                <a href="usuwacz-parametrow.php">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtr URL
+                </a>
+            </li>
+        </ul>
     </div>
-</div>
+
+    <a href="logout.php" class="logout-btn">
+        <i class="fa-solid fa-lock"></i>
+        Wyloguj się
+    </a>
+</aside>

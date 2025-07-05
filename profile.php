@@ -24,7 +24,6 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $current_email = $user['email'];
 
-
 // Obsługa zmiany hasła
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     $current_password = $_POST['current_password'];
@@ -94,74 +93,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_email'])) {
         }
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Twój profil'; include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Twój profil'; include 'inc/head.php'; ?>
 <body>
+
+<div class="container">
     <?php include('inc/sidebar.php'); ?>
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Twój profil</h1>
 
-    <?php if ($error): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+    <main class="main-content">
+        <header class="header">
+            <h1>Twój profil</h1>
+        </header>
 
-    <?php if ($success): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
 
-            <!-- Informacje o użytkowniku -->
-            <h3>Informacje o koncie</h3>
-            <p><strong>Użytkownik:</strong> <?= htmlspecialchars($username) ?></p>
-            <p><strong>Rola:</strong> <?= htmlspecialchars($role) ?></p>
-            <p><strong>E-mail:</strong> <?= htmlspecialchars($current_email) ?></p>
+        <!-- Informacje o użytkowniku -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-user"></i>
+                Informacje o koncie
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div>
+                    <strong>Użytkownik:</strong><br>
+                    <span style="color: var(--text-dark);"><?= htmlspecialchars($username) ?></span>
+                </div>
+                <div>
+                    <strong>Rola:</strong><br>
+                    <span style="color: var(--text-dark);"><?= htmlspecialchars($role) ?></span>
+                </div>
+                <div>
+                    <strong>E-mail:</strong><br>
+                    <span style="color: var(--text-dark);"><?= htmlspecialchars($current_email) ?></span>
+                </div>
+            </div>
+        </div>
 
-            <hr>
-
-            <!-- Formularz zmiany hasła -->
-            <h3>Zmień hasło</h3>
+        <!-- Formularz zmiany hasła -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-key"></i>
+                Zmień hasło
+            </h3>
             <form method="POST" action="">
-                <div class="mb-3">
-                    <label for="current_password" class="form-label">Bieżące hasło</label>
-                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label for="current_password" class="form-label">Bieżące hasło</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_password" class="form-label">Nowe hasło</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Potwierdź nowe hasło</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="new_password" class="form-label">Nowe hasło</label>
-                    <input type="password" class="form-control" id="new_password" name="new_password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="confirm_password" class="form-label">Potwierdź nowe hasło</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                </div>
-                <button type="submit" name="change_password" class="btn btn-primary w-100">Zmień hasło</button>
+                <button type="submit" name="change_password" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i>
+                    Zmień hasło
+                </button>
             </form>
+        </div>
 
-            <hr>
-
-            <!-- Formularz zmiany e-maila -->
-            <h3>Zmień adres e-mail</h3>
+        <!-- Formularz zmiany e-maila -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-envelope"></i>
+                Zmień adres e-mail
+            </h3>
             <form method="POST" action="">
-                <div class="mb-3">
+                <div class="form-group" style="max-width: 400px;">
                     <label for="new_email" class="form-label">Nowy adres e-mail</label>
                     <input type="email" class="form-control" id="new_email" name="new_email" value="<?= htmlspecialchars($current_email) ?>" required>
                 </div>
-                <button type="submit" name="change_email" class="btn btn-primary w-100">Zmień e-mail</button>
+                <button type="submit" name="change_email" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i>
+                    Zmień e-mail
+                </button>
             </form>
-
-            <hr>
-
         </div>
-    </div>
-</div>
     </main>
+</div>
 
 </body>
 </html>

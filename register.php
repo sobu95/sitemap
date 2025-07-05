@@ -27,35 +27,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Rejestracja'; include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Rejestracja'; include 'inc/head.php'; ?>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Rejestracja</h1>
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            <form method="POST" action="">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nazwa użytkownika</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Hasło</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Zarejestruj się</button>
-            </form>
-            <p class="mt-3 text-center">
-                Masz już konto? <a href="index.php">Zaloguj się</a>
-            </p>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">Ankor-PukSoft</div>
+        <h1 class="auth-title">Rejestracja</h1>
+
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
+            <div class="form-group">
+                <label for="username" class="form-label">Nazwa użytkownika</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Hasło</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-user-plus"></i>
+                Zarejestruj się
+            </button>
+        </form>
+
+        <div class="auth-link">
+            Masz już konto? <a href="index.php">Zaloguj się</a>
         </div>
     </div>
 </div>
+
 </body>
 </html>

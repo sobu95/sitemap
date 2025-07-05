@@ -16,27 +16,14 @@ if (!is_logged_in()) {
 
 $user_id = $_SESSION['user_id']; // Pobieramy ID zalogowanego użytkownika
 $username = $_SESSION['username']; // Pobieramy nazwę użytkownika
-?>
-<!DOCTYPE html>
-<html lang="pl">
-<?php $page_title = 'Usuwanie adresów URL z parametrem'; include 'inc/head.php'; ?>
-<body>
 
-    <?php include('inc/sidebar.php'); ?>
+$filtered_urls = [];
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="container">
- 
-<?php
-// Sprawdzamy, czy formularz został przesłany
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Pobieramy listę URLi z formularza
     $urls = isset($_POST['urls']) ? explode(PHP_EOL, trim($_POST['urls'])) : [];
     // Pobieramy frazy, które mają być sprawdzone w URLach
     $exclude_phrases = isset($_POST['exclude_phrases']) ? explode(',', trim($_POST['exclude_phrases'])) : [];
-
-    // Lista przechowująca przefiltrowane URL-e
-    $filtered_urls = [];
 
     // Iteracja po URL-ach
     foreach ($urls as $url) {
@@ -56,29 +43,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $filtered_urls[] = $url;
         }
     }
-
-    // Wyświetlamy wynik
-    echo '<h3>Wynik:</h3>';
-    echo '<pre>' . implode(PHP_EOL, $filtered_urls) . '</pre>';
 }
 ?>
+<!DOCTYPE html>
+<html lang="pl">
+<?php $page_title = 'Ankor-PukSoft - Usuwanie adresów URL z parametrem'; include 'inc/head.php'; ?>
+<body>
 
-<!-- Formularz HTML do wprowadzenia danych -->
-<form method="post">
-    <div class="mb-3">
-        <label for="urls" class="form-label">Wprowadź adresy URL (jeden na linię):</label>
-        <textarea class="form-control" id="urls" name="urls" rows="10" placeholder="Wprowadź adresy URL"></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="exclude_phrases" class="form-label">Wprowadź frazy do wykluczenia (oddzielone przecinkami):</label>
-        <input type="text" class="form-control" id="exclude_phrases" name="exclude_phrases" placeholder="np. ?, .webp">
-    </div>
-    <button type="submit" class="btn btn-primary">Filtruj URL-e</button>
-</form>
+<div class="container">
+    <?php include('inc/sidebar.php'); ?>
 
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Filtr URL</span>
+        </div>
 
-    </div>
-</main>
+        <header class="header">
+            <h1>Filtrowanie adresów URL</h1>
+        </header>
+
+        <div class="content-panel">
+            <!-- Formularz HTML do wprowadzenia danych -->
+            <form method="post">
+                <div class="form-group">
+                    <label for="urls" class="form-label">Wprowadź adresy URL (jeden na linię):</label>
+                    <textarea class="form-control" id="urls" name="urls" rows="10" placeholder="https://example.com/page1&#10;https://example.com/page2?param=value&#10;..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exclude_phrases" class="form-label">Wprowadź frazy do wykluczenia (oddzielone przecinkami):</label>
+                    <input type="text" class="form-control" id="exclude_phrases" name="exclude_phrases" placeholder="np. ?, .webp, /admin">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtruj URL-e
+                </button>
+            </form>
+        </div>
+
+        <?php if (!empty($filtered_urls)): ?>
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-list"></i>
+                Przefiltrowane URL-e (<?= count($filtered_urls) ?>)
+            </h3>
+            <div style="background-color: var(--sidebar-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">
+<?= htmlspecialchars(implode(PHP_EOL, $filtered_urls)) ?>
+            </div>
+        </div>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+        <div class="alert alert-warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Wszystkie URL-e zostały odfiltrowane lub nie wprowadzono żadnych URL-i.
+        </div>
+        <?php endif; ?>
+    </main>
+</div>
 
 </body>
 </html>

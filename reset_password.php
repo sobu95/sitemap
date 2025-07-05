@@ -77,40 +77,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password']) && isset(
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Resetowanie hasła'; include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Resetowanie hasła'; include 'inc/head.php'; ?>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Resetowanie hasła</h1>
 
-    <?php if ($error): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">Ankor-PukSoft</div>
+        <h1 class="auth-title">Resetowanie hasła</h1>
 
-    <?php if ($success): ?>
-        <div class="alert alert-success"><?= $success ?></div>
-    <?php else: ?>
-        <?php if (!empty($token)): ?>
-            <!-- Formularz resetu hasła -->
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <form method="POST" action="">
-                        <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Nowe hasło</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password_confirm" class="form-label">Potwierdź nowe hasło</label>
-                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Zresetuj hasło</button>
-                    </form>
-                </div>
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <?= $success ?>
             </div>
         <?php else: ?>
-            <p>Nieprawidłowy lub wygasły token resetu hasła.</p>
+            <?php if (!empty($token)): ?>
+                <!-- Formularz resetu hasła -->
+                <form method="POST" action="">
+                    <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+                    <div class="form-group">
+                        <label for="password" class="form-label">Nowe hasło</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_confirm" class="form-label">Potwierdź nowe hasło</label>
+                        <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fa-solid fa-save"></i>
+                        Zresetuj hasło
+                    </button>
+                </form>
+            <?php else: ?>
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Nieprawidłowy lub wygasły token resetu hasła.
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
-    <?php endif; ?>
+
+        <div class="auth-link">
+            <a href="index.php">Powrót do logowania</a>
+        </div>
+    </div>
 </div>
 
 </body>

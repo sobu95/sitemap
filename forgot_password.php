@@ -71,28 +71,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
 
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Resetowanie hasła'; include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Resetowanie hasła'; include 'inc/head.php'; ?>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Zapomniałeś hasła?</h1>
 
-    <?php if ($error): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">Ankor-PukSoft</div>
+        <h1 class="auth-title">Zapomniałeś hasła?</h1>
 
-    <?php if ($success): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
 
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form method="POST" action="">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Podaj swój adres e-mail</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Wyślij link do resetu hasła</button>
-            </form>
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
+            <div class="form-group">
+                <label for="email" class="form-label">Podaj swój adres e-mail</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-paper-plane"></i>
+                Wyślij link do resetu hasła
+            </button>
+        </form>
+
+        <div class="auth-link">
+            Pamiętasz hasło? <a href="index.php">Zaloguj się</a>
         </div>
     </div>
 </div>

@@ -19,45 +19,72 @@ $username = $_SESSION['username']; // Pobieramy nazwę użytkownika
 ?>
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Status checker'; include '../inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Status checker'; include '../inc/head.php'; ?>
 <body>
 
+<div class="container">
     <?php include('../inc/sidebar.php'); ?>
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="container">
-    <h1>Sprawdzanie statusu URL-i</h1>
-    <!-- Formularz HTML do wprowadzenia danych -->
-    <form method="post" id="url-form">
-        <div class="mb-3">
-            <label for="urls" class="form-label">Wprowadź adresy URL (jeden na linię, max 10):</label>
-            <textarea class="form-control" id="urls" name="urls" rows="10" placeholder="Wprowadź adresy URL"></textarea>
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="../dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Status Code Checker</span>
         </div>
-        <div class="mb-3">
-            <label for="rate_limit" class="form-label">Czy system ma rate-limiting?</label>
-            <select class="form-control" id="rate_limit" name="rate_limit">
-                <option value="no">Nie</option>
-                <option value="yes">Tak</option>
-            </select>
+
+        <header class="header">
+            <h1>Sprawdzanie statusu URL-i</h1>
+        </header>
+
+        <div class="content-panel">
+            <!-- Formularz HTML do wprowadzenia danych -->
+            <form method="post" id="url-form">
+                <div class="form-group">
+                    <label for="urls" class="form-label">Wprowadź adresy URL (jeden na linię, max 10):</label>
+                    <textarea class="form-control" id="urls" name="urls" rows="10" placeholder="https://example.com&#10;https://example2.com&#10;..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rate_limit" class="form-label">Czy system ma rate-limiting?</label>
+                    <select class="form-control form-select" id="rate_limit" name="rate_limit">
+                        <option value="no">Nie</option>
+                        <option value="yes">Tak</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    Rozpocznij skanowanie
+                </button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary">Rozpocznij skanowanie</button>
-    </form>
 
-    <!-- Miejsce na komunikat -->
-    <div id="scan-message" class="mt-5" style="display: none;">
-        <p>Trwa sprawdzanie domen...</p>
-    </div>
+        <!-- Miejsce na komunikat -->
+        <div id="scan-message" class="content-panel" style="display: none;">
+            <div style="text-align: center;">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem;">Trwa sprawdzanie domen...</p>
+            </div>
+        </div>
 
-    <!-- Miejsce na wyniki -->
-    <div id="results" class="mt-5" style="display: none;">
-        <h3>Wynik:</h3>
-        <table class="table table-striped">
-            <thead><tr><th>URL</th><th>Status</th><th>Przekierowanie</th></tr></thead>
-            <tbody id="results-body"></tbody>
-        </table>
-        <p id="remaining-urls">Pozostało X adresów URL do sprawdzenia</p>
-    </div>
-</main>
+        <!-- Miejsce na wyniki -->
+        <div id="results" class="content-panel" style="display: none;">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-chart-line"></i>
+                Wyniki sprawdzenia
+            </h3>
+            <table class="domain-table">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Status</th>
+                        <th>Przekierowanie</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+            <p id="remaining-urls" style="margin-top: 1rem; color: var(--text-dark);"></p>
+        </div>
+    </main>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

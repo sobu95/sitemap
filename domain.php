@@ -32,10 +32,16 @@ if ($result->num_rows === 0) {
     $head = ob_get_clean();
     echo $head;
     echo '<body>
-        <div class="container mt-5">
-            <div class="alert alert-danger">
-                Domena nie została znaleziona lub nie masz do niej dostępu.<br />
-                <a href="dashboard.php" class="btn btn-secondary mt-3">Powrót do panelu</a>
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Domena nie została znaleziona lub nie masz do niej dostępu.
+                </div>
+                <a href="dashboard.php" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Powrót do panelu
+                </a>
             </div>
         </div>
 </body>
@@ -45,14 +51,18 @@ if ($result->num_rows === 0) {
 
 $domain = $result->fetch_assoc();
 $domain_url = $domain['domain'];
-$is_competitor = $domain['competitor'];  // 0 - własna domena, 1 - konkurencja
+$is_competitor = $domain['competitor'];
 $current_interval = $domain['check_interval_days'];
 $current_threshold = $domain['alert_threshold_percent'];
+
 $stmt = $conn->prepare("SELECT check_interval_days, alert_threshold_percent FROM settings LIMIT 1");
 $stmt->execute();
 $global_settings = $stmt->get_result()->fetch_assoc();
 $current_interval = $current_interval ?? $global_settings['check_interval_days'];
 $current_threshold = $current_threshold ?? $global_settings['alert_threshold_percent'];
+
+$success_message = '';
+$error_message = '';
 
 // Aktualizacja ustawień domeny
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_domain_settings'])) {
@@ -69,8 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_domain_setting
         $error_message = 'Wystąpił błąd podczas aktualizacji ustawień.';
     }
 }
-$success_message = '';
-$error_message = '';
 
 // Paginacja dla historii sprawdzeń
 $items_per_page = 10;
@@ -95,71 +103,126 @@ $stmt->bind_param('i', $user_id);
 $stmt->execute();
 $competitor_result = $stmt->get_result();
 $competitors = $competitor_result->fetch_all(MYSQLI_ASSOC);
+
+function simplifyDomain($url) {
+    $parsed_url = parse_url($url);
+    $domain = isset($parsed_url['host']) ? $parsed_url['host'] : $parsed_url['path'];
+    return preg_replace('/^www\./', '', $domain);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Szczegóły domeny - ' . htmlspecialchars($domain['domain']); include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Szczegóły domeny'; include 'inc/head.php'; ?>
 <body>
 
-    <?php
-    include('inc/sidebar.php');
-    ?>
+<div class="container">
+    <?php include('inc/sidebar.php'); ?>
 
-   
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    
-        <h1 class="text-center mb-4">Szczegóły sitemapy: <?= htmlspecialchars($domain['domain']) ?></h1>
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <span><?= htmlspecialchars(simplifyDomain($domain['domain'])) ?></span>
+        </div>
+
+        <header class="header">
+            <h1>Szczegóły domeny</h1>
+            <div class="header-actions">
+                <a href="check_sitemap.php?domain_id=<?= $domain_id ?>" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    Sprawdź teraz
+                </a>
+            </div>
+        </header>
 
         <?php if ($success_message): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($success_message) ?></div>
+            <div class="alert alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <?= htmlspecialchars($success_message) ?>
+            </div>
         <?php endif; ?>
         
         <?php if ($error_message): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error_message) ?></div>
+            <div class="alert alert-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <?= htmlspecialchars($error_message) ?>
+            </div>
         <?php endif; ?>
 
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <h3>Ustawienia domeny</h3>
-                <form method="POST" action="">
-                    <div class="mb-3">
-                        <label for="check_interval_days" class="form-label">Częstość sprawdzania sitemapy (dni)</label>
-                        <input type="number" class="form-control" id="check_interval_days" name="check_interval_days" value="<?= htmlspecialchars($current_interval) ?>" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="alert_threshold_percent" class="form-label">Próg procentowej zmiany</label>
-                        <input type="number" class="form-control" id="alert_threshold_percent" name="alert_threshold_percent" value="<?= htmlspecialchars($current_threshold) ?>" required>
-                    </div>
-                    <button type="submit" name="update_domain_settings" class="btn btn-primary">Zapisz ustawienia</button>
-                </form>
+        <!-- Informacje o domenie -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-globe"></i>
+                <?= htmlspecialchars(simplifyDomain($domain['domain'])) ?>
+            </h3>
+            <p style="color: var(--text-dark); margin-bottom: 1.5rem;">
+                <strong>Pełny URL:</strong> <?= htmlspecialchars($domain['domain']) ?>
+            </p>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="check_sitemap.php?domain_id=<?= $domain_id ?>" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    Sprawdź sitemapę
+                </a>
+                <a href="compare_sitemaps.php?domain_id=<?= $domain_id ?>" class="btn btn-secondary">
+                    <i class="fa-solid fa-code-compare"></i>
+                    Porównaj sitemapy
+                </a>
+                <a href="manage_competitors.php?domain_id=<?= $domain_id ?>" class="btn btn-secondary">
+                    <i class="fa-solid fa-users"></i>
+                    Zarządzaj konkurencją
+                </a>
+                <a href="show_latest_sitemap.php?domain_id=<?= $domain_id ?>" class="btn btn-secondary">
+                    <i class="fa-solid fa-file-code"></i>
+                    Pokaż ostatnią sitemapę
+                </a>
             </div>
         </div>
 
+        <!-- Ustawienia domeny -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-cog"></i>
+                Ustawienia domeny
+            </h3>
+            <form method="POST" action="">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label for="check_interval_days" class="form-label">Częstość sprawdzania sitemapy (dni)</label>
+                        <input type="number" class="form-control" id="check_interval_days" name="check_interval_days" value="<?= htmlspecialchars($current_interval) ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="alert_threshold_percent" class="form-label">Próg procentowej zmiany</label>
+                        <input type="number" class="form-control" id="alert_threshold_percent" name="alert_threshold_percent" value="<?= htmlspecialchars($current_threshold) ?>" required>
+                    </div>
+                </div>
+                <button type="submit" name="update_domain_settings" class="btn btn-primary">
+                    <i class="fa-solid fa-save"></i>
+                    Zapisz ustawienia
+                </button>
+            </form>
+        </div>
 
-        <!-- Linki do dodatkowych funkcji -->
-<div class="row justify-content-center mb-4">
-    <div class="col-md-8 text-center">
-        <a href="check_sitemap.php?domain_id=<?= $domain_id ?>" class="btn btn-primary">Sprawdź teraz sitemapę</a>
-        <a href="compare_sitemaps.php?domain_id=<?= $domain_id ?>" class="btn btn-info">Porównaj sitemapy</a>
-        <a href="manage_competitors.php?domain_id=<?= $domain_id ?>" class="btn btn-secondary">Zarządzaj konkurencją</a>
-        <a href="show_latest_sitemap.php?domain_id=<?= $domain_id ?>" class="btn btn-outline-secondary mt-2 mt-md-0">Pokaż ostatnią sitemapę</a>
-
-        <div class="mt-3">
-            <h5>Pokaż konkretną sitemapę:</h5>
+        <!-- Wybór konkretnej sitemapy -->
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-file-code"></i>
+                Pokaż konkretną sitemapę
+            </h3>
             <?php
             $uploads_dir = 'sitemaps/' . $user_id;
             $sitemap_files = glob($uploads_dir . '/' . $domain_id . '_*.xml');
 
             if (!empty($sitemap_files)):
                 usort($sitemap_files, function($a, $b) {
-                    return filemtime($b) - filemtime($a); // Sortuj od najnowszych
+                    return filemtime($b) - filemtime($a);
                 });
             ?>
-                <form action="show_selected_sitemap.php" method="GET" class="mt-2">
+                <form action="show_selected_sitemap.php" method="GET">
                     <input type="hidden" name="domain_id" value="<?= $domain_id ?>">
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label for="sitemap_file" class="form-label">Wybierz sitemapę:</label>
-                        <select class="form-select" id="sitemap_file" name="sitemap_file">
+                        <select class="form-control form-select" id="sitemap_file" name="sitemap_file">
                             <?php foreach ($sitemap_files as $file): ?>
                                 <?php
                                 $filename = basename($file);
@@ -170,41 +233,44 @@ $competitors = $competitor_result->fetch_all(MYSQLI_ASSOC);
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-outline-secondary">Pokaż wybraną sitemapę</button>
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa-solid fa-eye"></i>
+                        Pokaż wybraną sitemapę
+                    </button>
                 </form>
             <?php else: ?>
-                <p class="text-muted">Brak zapisanych sitemap dla tej domeny.</p>
+                <p style="color: var(--text-dark);">Brak zapisanych sitemap dla tej domeny.</p>
             <?php endif; ?>
         </div>
-    </div>
-</div>
 
         <!-- Historia sprawdzeń -->
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <?php if (count($history) > 0): ?>
-                    <table class="table table-bordered">
-                        <thead>
+        <div class="content-panel">
+            <h3 style="margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-history"></i>
+                Historia sprawdzeń
+            </h3>
+            <?php if (count($history) > 0): ?>
+                <table class="domain-table">
+                    <thead>
+                        <tr>
+                            <th>Data sprawdzenia</th>
+                            <th>Liczba podstron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($history as $check): ?>
                             <tr>
-                                <th>Data sprawdzenia</th>
-                                <th>Liczba podstron</th>
+                                <td><?= htmlspecialchars($check['checked_at']) ?></td>
+                                <td><?= htmlspecialchars($check['result']) ?></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($history as $check): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($check['checked_at']) ?></td>
-                                    <td><?= htmlspecialchars($check['result']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p class="text-center">Brak danych o sprawdzeniach dla tej domeny.</p>
-                <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
 
+                <!-- Paginacja -->
+                <?php if ($total_pages > 1): ?>
                 <nav aria-label="Paginacja">
-                    <ul class="pagination justify-content-center">
+                    <ul class="pagination">
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <li class="page-item <?= $i == $page ? 'active' : '' ?>">
                                 <a class="page-link" href="?id=<?= $domain_id ?>&page=<?= $i ?>"><?= $i ?></a>
@@ -212,10 +278,16 @@ $competitors = $competitor_result->fetch_all(MYSQLI_ASSOC);
                         <?php endfor; ?>
                     </ul>
                 </nav>
-            </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <p style="text-align: center; color: var(--text-dark); padding: 2rem;">
+                    <i class="fa-solid fa-clock" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i><br>
+                    Brak danych o sprawdzeniach dla tej domeny.
+                </p>
+            <?php endif; ?>
         </div>
-
     </main>
+</div>
 
 </body>
 </html>

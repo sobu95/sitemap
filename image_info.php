@@ -17,6 +17,8 @@ if (!is_logged_in()) {
 $user_id = $_SESSION['user_id']; // Pobieramy ID zalogowanego użytkownika
 $username = $_SESSION['username']; // Pobieramy nazwę użytkownika
 
+$results = [];
+
 // Funkcja do pobrania grafik z elementów zawierających "blog" w klasie lub identyfikatorze i zwrócenia ich wymiarów
 function get_images_from_blog_section($url) {
     // Pobranie zawartości strony
@@ -131,64 +133,105 @@ function extract_max_width_from_css($class) {
 
     return $screen_width * $max_width_percentage;
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['text'])) {
+    // Wyciąganie URL-i za pomocą wyrażenia regularnego
+    $text = $_POST['text'];
+    $urls = preg_match_all('/(https?:\/\/\S+)/', $text, $matches);
+
+    if (!empty($matches[0])) {
+        $urls = $matches[0];
+        foreach ($urls as $url) {
+            $image_data = get_images_from_blog_section($url);
+            $results[] = [
+                'url' => $url,
+                'images' => $image_data
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pl">
-<?php $page_title = 'Wyciąganie wymiarów grafik z URL'; include 'inc/head.php'; ?>
+<?php $page_title = 'Ankor-PukSoft - Wyciąganie wymiarów grafik z URL'; include 'inc/head.php'; ?>
 <body>
 
-    <?php
-    include('inc/sidebar.php');
-    ?>
+<div class="container">
+    <?php include('inc/sidebar.php'); ?>
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="container">
-        <h1 class="text-center my-4">Wyciąganie wymiarów grafik z URL</h1>
+    <main class="main-content">
+        <div class="breadcrumb">
+            <a href="dashboard.php">Domeny</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Info o grafikach</span>
+        </div>
 
-        <form action="" method="post">
-            <div class="mb-3">
-                <label for="text" class="form-label">Wprowadź listę URL</label>
-                <textarea id="text" name="text" rows="10" class="form-control"></textarea>
+        <header class="header">
+            <h1>Wyciąganie wymiarów grafik z URL</h1>
+        </header>
+
+        <div class="content-panel">
+            <form action="" method="post">
+                <div class="form-group">
+                    <label for="text" class="form-label">Wprowadź listę URL</label>
+                    <textarea id="text" name="text" rows="10" class="form-control" placeholder="Wklej tutaj adresy URL stron do analizy..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-search"></i>
+                    Analizuj grafiki
+                </button>
+            </form>
+        </div>
+
+        <?php if (!empty($results)): ?>
+            <?php foreach ($results as $result): ?>
+                <div class="content-panel">
+                    <h3 style="margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-globe"></i>
+                        <a href="<?= htmlspecialchars($result['url']) ?>" target="_blank" style="color: var(--primary-blue); text-decoration: none;">
+                            <?= htmlspecialchars($result['url']) ?>
+                        </a>
+                    </h3>
+
+                    <?php if ($result['images']): ?>
+                        <div style="display: grid; gap: 1rem;">
+                            <?php foreach ($result['images'] as $image_info): ?>
+                                <div style="background-color: var(--sidebar-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <strong>Grafika:</strong> 
+                                        <a href="<?= htmlspecialchars($image_info['src']) ?>" target="_blank" style="color: var(--primary-blue); text-decoration: none;">
+                                            <?= htmlspecialchars($image_info['src']) ?>
+                                        </a>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; color: var(--text-dark);">
+                                        <div>
+                                            <strong>Wymiary wyświetlane:</strong><br>
+                                            <?= htmlspecialchars($image_info['display_width'] ?: 'Nieznane') ?>x<?= htmlspecialchars($image_info['display_height'] ?: 'Nieznane') ?>px
+                                        </div>
+                                        <div>
+                                            <strong>Rzeczywiste wymiary:</strong><br>
+                                            <?= htmlspecialchars($image_info['real_width']) ?>x<?= htmlspecialchars($image_info['real_height']) ?>px
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="alert alert-warning">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            Nie znaleziono grafik w sekcji "blog" lub nie udało się pobrać ich wymiarów.
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
+            <div class="alert alert-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Nie znaleziono żadnych adresów URL w podanej treści.
             </div>
-            <button type="submit" class="btn btn-primary">Wyślij</button>
-        </form>
-
-        <?php
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['text'])) {
-            // Wyciąganie URL-i za pomocą wyrażenia regularnego
-            $text = $_POST['text'];
-            $urls = preg_match_all('/(https?:\/\/\S+)/', $text, $matches);
-
-            echo '<div class="mt-4">';
-            if (!empty($matches[0])) {
-                $urls = $matches[0];
-                echo "<h2>Znaleziono URLe:</h2><ul class='list-group'>";
-                foreach ($urls as $url) {
-                    $image_data = get_images_from_blog_section($url);
-                    echo '<li class="list-group-item">';
-                    echo '<a href="' . htmlspecialchars($url) . '" target="_blank">' . htmlspecialchars($url) . '</a><br>';
-
-                    if ($image_data) {
-                        foreach ($image_data as $image_info) {
-                            echo 'Grafika: <a href="' . htmlspecialchars($image_info['src']) . '" target="_blank">' . htmlspecialchars($image_info['src']) . '</a><br>';
-                            echo 'Wymiary wyświetlane: ' . htmlspecialchars($image_info['display_width'] ?: 'Nieznane') . 'x' . htmlspecialchars($image_info['display_height'] ?: 'Nieznane') . 'px<br>';
-                            echo 'Rzeczywiste wymiary: ' . htmlspecialchars($image_info['real_width']) . 'x' . htmlspecialchars($image_info['real_height']) . 'px<br><br>';
-                        }
-                    } else {
-                        echo '<div class="alert alert-warning">Nie znaleziono grafik w sekcji "blog" lub nie udało się pobrać ich wymiarów.</div>';
-                    }
-                    echo '</li>';
-                }
-                echo "</ul>";
-            } else {
-                echo '<div class="alert alert-warning">Nie znaleziono żadnych adresów URL w podanej treści.</div>';
-            }
-            echo '</div>';
-        }
-        ?>
-
-    </div>
-</main>
+        <?php endif; ?>
+    </main>
+</div>
 
 </body>
 </html>
